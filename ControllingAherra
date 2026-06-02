@@ -1,1 +1,221 @@
+package Aherra;
 
+//imports
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Random;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+
+// JPANEL CLASS
+public class ControllingAherra extends JPanel {
+	
+	// ALL LOCAL VARIABLES OF MOTION TIMERS AND BOOLEANS
+	int currentHealth, maxHealth, currentDamage, minDamage, maxDamage, hideArmour, moveSpeed, attackSpeed;
+	int score, time;
+	
+	// CONDITIONS
+	boolean biting, jumping, enerraBiting, enerraJumping;
+	
+	// TIMERS AND INCREMENTS OF MOTION
+	int jumpTimer, biteTimer, enerraJumpTimer, enerraBiteTimer;
+	int biteVertical, jumpHorizontal, enerraBiteVertical, enerraJumpHorizontal;
+	
+	BufferedImage tiger, enemyTiger;
+	
+	// Constructor method
+	public ControllingAherra()
+	{
+		currentHealth = 10;
+		maxHealth = 10;
+		currentDamage = 2;
+		minDamage = 1;
+		maxDamage = 3;
+		hideArmour = 4;
+		moveSpeed = 1;
+		attackSpeed = 2;
+		time = 0;
+		score = 0;
+		
+		biting = false;
+		jumping = false;
+		enerraBiting = false;
+		enerraJumping = false;
+		
+		jumpTimer = 0;
+		biteTimer = 0;
+		jumpHorizontal = 0;
+		biteVertical = 0;
+		
+		enerraJumpTimer = 0;
+		enerraBiteTimer = 0;
+		enerraBiteVertical = 0;
+		enerraJumpHorizontal = 0;
+		
+		tiger = null;
+		enemyTiger = null;
+	}
+	
+	public void moveLeft()
+	{
+		
+	}
+	public void moveRight()
+	{
+		
+	}
+	public void moveUp()
+	{
+		
+	}
+	public void moveDown()
+	{
+		
+	}
+	public void jump()
+	{
+		jumping = true;
+		jumpTimer = 1;
+		System.out.println("jumped");
+	}
+	public void bite()
+	{
+		biting = true;
+		biteTimer = 1;
+		System.out.println("bited");
+	}
+	public void enerraJump()
+	{
+		enerraJumping = true;
+		enerraJumpTimer = 1;
+		System.out.println("enerra jumped");
+	}
+	public void enerraBite()
+	{
+		enerraBiting = true;
+		enerraBiteTimer = 1;
+		System.out.println("enerra bited");
+	}
+	public void updateMotionTimers()
+	{
+		// OFFSET BITE COORDINATES BASED OFF TIMER
+		if(biteTimer == 1)
+			  biteVertical = 10;
+		  else if(biteTimer == 2)
+			  biteVertical = -15;
+		  else if(biteTimer == 3)
+			  biteVertical = 25;
+		  else if(biteTimer == 4)
+			  biteVertical = -35;
+		  else if(biteTimer == 5)
+			  biteVertical = 50;
+		  else
+			  biteVertical = 0;
+		  
+		// OFFSET JUMP COORDINATES BASED OFF TIMER
+		  if(jumpTimer == 1)
+			  jumpHorizontal = 10;
+		  else if(jumpTimer == 2)
+			  jumpHorizontal = -15;
+		  else if(jumpTimer == 3)
+			  jumpHorizontal = 25;
+		  else if(jumpTimer == 4)
+			  jumpHorizontal = -35;
+		  else if(jumpTimer == 5)
+			  jumpHorizontal = 50;
+		  else if(jumpTimer == 6)
+			  jumpHorizontal = -50;
+		  else if(jumpTimer == 7)
+			  jumpHorizontal = 50;
+		  else if(jumpTimer == 8)
+			  jumpHorizontal = -50;
+		  else
+			  jumpHorizontal = 0;
+		  
+		  // ENERRA BITE ANIME
+		  if(enerraBiteTimer == 1)
+			  enerraBiteVertical = 5;
+		  else if(enerraBiteTimer == 2)
+			  enerraBiteVertical = 15;
+		  else if(enerraBiteTimer == 3)
+			  enerraBiteVertical = 25;
+		  else if(enerraBiteTimer == 4)
+			  enerraBiteVertical = 35;
+		  else if(enerraBiteTimer == 5)
+			  enerraBiteVertical = 50;
+		  else if(enerraBiteTimer == 13)
+			  enerraBiteVertical = 0;
+		  
+		  // ENERRA JUMP ANIME
+		  if(enerraJumpTimer == 1)
+			  enerraJumpHorizontal = 10;
+		  else if(enerraJumpTimer == 2)
+			  enerraJumpHorizontal = -15;
+		  else if(enerraJumpTimer == 3)
+			  enerraJumpHorizontal = 25;
+		  else if(enerraJumpTimer == 4)
+			  enerraJumpHorizontal = -35;
+		  else if(enerraJumpTimer == 5)
+			  enerraJumpHorizontal = 50;
+		  else if(enerraJumpTimer == 6)
+			  enerraJumpHorizontal = -50;
+		  else if(enerraJumpTimer == 7)
+			  enerraJumpHorizontal = 50;
+		  else if(enerraJumpTimer == 8)
+			  enerraJumpHorizontal = -50;
+		  else
+			  enerraJumpHorizontal = 0;
+	}
+	
+	@Override
+	// paint with graphics G
+	public void paintComponent(Graphics g) {
+	  super.paintComponent(g);
+	  
+	  // UPDATE TIMERS FROM PAINT CLASS LOL
+	  updateMotionTimers();
+	  
+	  // DRAW IMAGES
+	  g.drawImage(tiger, 150+jumpHorizontal, 150+biteVertical, 100, 85, getFocusCycleRootAncestor());
+	  g.drawImage(enemyTiger, 150-enerraJumpHorizontal, 50+enerraBiteVertical, 100, 85, getFocusCycleRootAncestor());
+	  
+	  // draw the TIME and SCORE
+	  g.setColor(Color.BLACK);
+	  Font font = new Font("Serif", Font.PLAIN, 20);
+	  g.setFont(font);
+	  g.drawString("Time: "+(time), 15, 50);
+	  g.drawString("Game Hunted: "+score, 300, 50);
+	  
+	  // RESET TIMERS
+	  if(biteTimer == 5)
+	  {
+		  biteTimer = 0;
+		  biting = false;
+	  }
+	  
+	  if(jumpTimer == 8)
+	  {
+		  jumpTimer = 0;
+		  jumping = false;
+	  }
+	  if(enerraBiteTimer == 13)
+	  {
+		  enerraBiteTimer = 0;
+		  enerraBiting = false;
+	  }
+	  
+	  if(enerraJumpTimer == 8)
+	  {
+		  enerraJumpTimer = 0;
+		  enerraJumping = false;
+	  }
+	}
+
+}
