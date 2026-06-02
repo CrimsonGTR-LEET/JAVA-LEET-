@@ -36,6 +36,7 @@ public class LandOfGael extends JFrame implements Runnable{
   // Global variables and objects
   int xFrameDim, xFrameLoc, yFrameDim, yFrameLoc;
   myPanelObject aNewPanel;
+	JPanel theMainPanel;
 
   // MAIN METHOD CALL CONSTRUCTOR
   public static void main(String[] args) {
@@ -69,6 +70,25 @@ public void initiateFramesAndObjects() {
   aNewPanel.revalidate();
 }
 
+// UPDATE THE PANELS WITH REPAINTING, INSTANCED WITHIN THE INFINITE RUN LOOP
+public void updatePanelObjects() {
+
+this.remove(theMainPanel);
+theMainPanel = new JPanel();
+
+// THE OBJECT PANEL
+aNewPanel.repaint();
+// DO ANY CALCULATIONS
+
+// REVALIDATE THE PANELS AND ADD THEM TO THE MAIN PANEL TO BE ADDED TO THE FRAME
+aNewPanel.revalidate();
+theMainPanel.revalidate();
+theMainPanel.add(aNewPanel);
+
+// ADD THE PANEL TO THIS JFRAME
+this.getContentPane().add(theMainPanel);
+}
+
 // START THREAD
 public void start() {
   if (runner == null) {
@@ -83,6 +103,8 @@ public void run()
 {
   while(true) {
     infinite loop
+
+	updatePanelObjects();
 
     try { Thread.sleep(10); }
 	catch (InterruptedException e) { }	
