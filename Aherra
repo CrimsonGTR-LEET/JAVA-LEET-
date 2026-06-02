@@ -1,1 +1,571 @@
+// IMPORTS AND PACKAGE
+package Aherra;
+// SWING
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+// FILE WRITE AND IMAGE
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.io.File;
+import javax.imageio.ImageIO;
+// AWT
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 
+// BASICALLY FIGHT AND DEFEND 
+
+// PROPERLY EXTENDS JFRAME WHICH WE WILL ADD OUR PANNELS AND IMPLEMENTS RUNNABLE
+// HOWEVER THE PANELS ARE NOT SEPERATE OBJECTS BUT INSTEAD A PANEL FROM THIS MAIN CLASS
+public class Aherra extends JFrame implements Runnable{
+	
+	// CLASS VARIABLES
+	Thread runner;
+	boolean runner_Stall;
+	int counter, locationXFrame, locationYFrame, sizeXFrame, sizeYFrame;
+	boolean A_Pressed, W_Pressed, S_Pressed, D_Pressed, Space_Pressed, B_Pressed;
+	BufferedImage aherraIcon, enerraIcon;
+	String loadedGame;
+	// PANELS AND BUTTONS
+	JPanel Centre_Panel, North_Panel, South_Panel, East_Panel, West_Panel, Main_Panel;
+	JButton helpButton, loadButton, saveButton, pauseButton, playButton;
+	// OBJECTS
+	ControllingAherra controllingAherra;
+	
+	// MAIN METHOD SHOW MESSAGE AND CALL CONSTRUCTOR
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		System.out.println("main method");
+		
+		JOptionPane.showMessageDialog(null, "Welcome King Aherra...", "Aherra", JOptionPane.PLAIN_MESSAGE);
+				
+		// initiate the constructor method
+		new Aherra();
+	}
+	
+	// START THREAD
+	public void start() {
+		if (runner == null) {
+			runner = new Thread(this);
+			runner.start();
+			}
+		System.out.println("start");
+		}
+	
+	// INFINITE LOOP
+	// CONDITIONS AND REPAINT
+	public void run() {
+		while(true) { 
+			// aherra biting CONDITION
+			if(runner_Stall != true && controllingAherra.biting == true)
+			{
+				controllingAherra.repaint();
+				
+				// bite animation for aherra
+				if(counter % 75 == 0)
+					controllingAherra.biteTimer++;
+				
+				// make enerra jump
+				//if(controllingAherra.biteTimer == 4)
+					//controllingAherra.enerraJump();
+			}
+			// aherra jumping CONDITION
+			if(runner_Stall != true && controllingAherra.jumping == true)
+			{
+				controllingAherra.repaint();
+				
+				// jump animation for aherra
+				if(counter % 75 == 0)
+					controllingAherra.jumpTimer++;
+			}
+			
+			// enerra jumping CONDITION
+			if(runner_Stall != true && controllingAherra.enerraJumping == true)
+			{
+				controllingAherra.repaint();
+				
+				// enerra jump animation
+				if(counter % 200 == 0)
+					controllingAherra.enerraJumpTimer++;
+			}
+			// enerra biting CONDITION
+			if(runner_Stall != true && controllingAherra.enerraBiting == true)
+			{
+				controllingAherra.repaint();
+				
+				// enerra bite animation
+				if(counter % 200 == 0)
+					controllingAherra.enerraBiteTimer++;
+			}
+			
+			// REFRESH the MAIN PANEL
+			if(runner_Stall != true && counter % 5 == 0)
+			{
+				// KEYS
+				if(A_Pressed)
+					controllingAherra.moveLeft();
+				if(S_Pressed)
+					controllingAherra.moveDown();
+				if(D_Pressed)
+					controllingAherra.moveRight();
+				if(W_Pressed)
+					controllingAherra.moveUp();
+				
+				// make enerra bite
+				if((counter % 4400 == 0 || counter % 4400 == 0) && !controllingAherra.enerraJumping)
+				{
+					controllingAherra.enerraBite();
+					
+					// if you aren't dodging or if you are biting, lose score
+					// if(!controllingAherra.jumping || controllingAherra.biting)
+						controllingAherra.score -= 70;
+				}
+					
+				// make enerra jump
+				if((counter % 2800 == 0 || counter % 7200 == 0) && !controllingAherra.enerraBiting)
+					controllingAherra.enerraJump();
+				
+				//if(Space_Pressed || B_Pressed || counter % 3000 == 0)
+					//controllingAherra.bite();
+				
+				if(counter % 500 == 0)
+					controllingAherra.time++;
+				controllingAherra.repaint();
+			}
+			
+			// refresh rate
+			if(counter == 100000)
+				counter = 0;
+			
+			if(!runner_Stall)
+				counter++;
+			
+			// ANIMATION SLEEP
+			try { Thread.sleep(1); }
+			catch (InterruptedException e) { }	
+		}
+	}
+	
+	// constructor method
+	// LOAD VARS AND ADD LISTENERS
+	// LOAD GAME
+	// START THREAD
+	public Aherra() {
+		setTitle("Aherra");
+		// VARS
+		initiateVars();
+		// FRAEMES
+		initiateFrames();
+		// LOAD GAME
+		loadImages();
+		// START
+		start();
+		
+		// add the keyListener
+		this.addKeyListener(new KeyListener(){
+            @Override
+           public void keyPressed(KeyEvent e) {
+                // W pressed
+            	if(e.getKeyCode() == 87){
+                   W_Pressed = true;
+                   System.out.println("W pressed");
+               }
+            	// A pressed
+            	if(e.getKeyCode() == 65){
+                   A_Pressed = true;
+               }
+            	// S pressed
+            	if(e.getKeyCode() == 83){
+                   S_Pressed = true;
+               }
+            	// D pressed
+            	if(e.getKeyCode() == 68){
+                   D_Pressed = true;
+               }
+            	// Space pressed
+            	if(e.getKeyCode() == 32){
+                   Space_Pressed = true;
+               }
+            	// Enter pressed
+            	if(e.getKeyCode() == 66){
+                   B_Pressed = true;
+               }
+           }
+
+           @Override
+           public void keyTyped(KeyEvent e) {
+        	   
+           }
+
+           @Override
+           public void keyReleased(KeyEvent e) {
+	        	// W released
+	           	if(e.getKeyCode() == 87){
+	                  W_Pressed = false;
+	                  System.out.println("w released");
+	              }
+	           	// A released
+	           	if(e.getKeyCode() == 65){
+	                  A_Pressed = false;                   
+	              }
+	           	// S released
+	           	if(e.getKeyCode() == 83){
+	                  S_Pressed = false;
+	              }
+	           	// D released
+	           	if(e.getKeyCode() == 68){
+	                  D_Pressed = false;
+	              }
+	           	// Space released
+	           	if(e.getKeyCode() == 32){
+	                  Space_Pressed = false;
+	              }
+	           	// Enter released
+	        	if(e.getKeyCode() == 66){
+	               B_Pressed = false;
+	               System.out.println("enter released");
+	           }
+         }
+           
+           
+		});
+		System.out.println("Added Keylistener");
+		
+		this.addMouseListener(new MouseListener(){
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+				// LEFT CLICK
+				if(e.getButton() == MouseEvent.BUTTON1) {
+		            System.out.println("Left Click!");
+		            
+		            if(!controllingAherra.biting)
+		            {
+		            	controllingAherra.bite();
+		        		
+		        		// if enerra isn't biting and is jumping then add to score
+						if(controllingAherra.enerraJumping && !controllingAherra.enerraBiting)
+							controllingAherra.score += 15;
+		            }
+		        		
+		          }
+				
+		          if(e.getButton() == MouseEvent.BUTTON2) {
+		        	System.out.println("Middle Click!");
+		          }
+		          
+		          // RIGHT CLICK
+		          if(e.getButton() == MouseEvent.BUTTON3) {
+		        	System.out.println("Right Click!");
+		        	
+		        	if(!controllingAherra.jumping)
+		        	{
+		        		controllingAherra.jump();
+		        		
+		        		// if enerra is biting then add to score
+						if(controllingAherra.enerraBiting)
+						{
+							controllingAherra.score += 7;
+							//controllingAherra.enerraBiting = false;
+							//controllingAherra.enerraBiteTimer = 0;
+						}
+		        	}
+		         }
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	
+	// initiate buttons and variables
+	// ADD BUTTON LISTENERS
+	public void initiateVars()
+	{
+		counter = 0;
+		locationXFrame = 50;
+		locationYFrame = 100;
+		sizeXFrame = 600;
+		sizeYFrame = 400;
+		runner_Stall = true;
+		playButton = new JButton("Play!");
+		helpButton = new JButton("Help!");
+		pauseButton = new JButton("Pause!");
+		saveButton = new JButton("Save Game!");
+		loadButton = new JButton("Load Game!");
+				
+		// play game
+		playButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	// start the Thread for the first time
+            	start();
+            	
+            	runner_Stall = false;
+            	
+            	// refresh the main pane
+            	remove(Main_Panel);
+            	
+        		Main_Panel = new JPanel(new BorderLayout());
+        		
+        		North_Panel = new JPanel();
+            	North_Panel.add(new JLabel("GAME ON :*"));
+            	North_Panel.add(pauseButton);
+        		
+        		Main_Panel.add(controllingAherra, BorderLayout.CENTER);
+        		Main_Panel.add(South_Panel, BorderLayout.SOUTH);
+        		Main_Panel.add(North_Panel, BorderLayout.NORTH);
+        		Main_Panel.add(East_Panel, BorderLayout.EAST);
+        		Main_Panel.add(West_Panel, BorderLayout.WEST);
+        		
+        		getContentPane().add(Main_Panel);
+        		revalidate();
+        		setSize(sizeXFrame, sizeYFrame);
+        		setLocation(locationXFrame, locationYFrame);
+        		setVisible(true);
+            }
+        });
+		
+		// pause game
+		pauseButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	runner_Stall = true;
+            	
+            	// refresh the main pane
+            	remove(Main_Panel);
+            	
+            	Main_Panel = new JPanel(new BorderLayout());
+        		        	
+            	North_Panel = new JPanel();
+            	North_Panel.add(new JLabel("HOWDY, it is Paused ;)"));
+            	North_Panel.add(playButton);
+        		
+            	Main_Panel.add(controllingAherra, BorderLayout.CENTER);
+        		Main_Panel.add(South_Panel, BorderLayout.SOUTH);
+        		Main_Panel.add(North_Panel, BorderLayout.NORTH);
+        		Main_Panel.add(East_Panel, BorderLayout.EAST);
+        		Main_Panel.add(West_Panel, BorderLayout.WEST);
+        		
+        		getContentPane().add(Main_Panel);
+        		revalidate();
+        		setSize(sizeXFrame, sizeYFrame);
+        		setLocation(locationXFrame, locationYFrame);
+        		setVisible(true);
+            }
+        });
+		
+		// help game
+		helpButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	runner_Stall = true;
+            	
+            	// refresh the main pane
+            	remove(Main_Panel);
+            	
+            	Main_Panel = new JPanel(new BorderLayout());
+        		        	
+            	Centre_Panel = new JPanel();
+        		Centre_Panel.add(new JLabel("HELLO ;)"));
+        		//Centre_Panel.add(new JLabel("       Joystick: Move!"));
+        		Centre_Panel.add(new JLabel("       Left Click: Bite!"));
+        		Centre_Panel.add(new JLabel("       Right Click: Leap!"));
+        		//Centre_Panel.add(new JLabel("       A: Roll!"));
+        		//Centre_Panel.add(new JLabel("       Y: Hind Legs Plant!"));
+        		
+        		Main_Panel.add(Centre_Panel, BorderLayout.CENTER);
+        		Main_Panel.add(South_Panel, BorderLayout.SOUTH);
+        		Main_Panel.add(North_Panel, BorderLayout.NORTH);
+        		Main_Panel.add(East_Panel, BorderLayout.EAST);
+        		Main_Panel.add(West_Panel, BorderLayout.WEST);
+        		
+        		getContentPane().add(Main_Panel);
+        		revalidate();
+        		setSize(sizeXFrame, sizeYFrame);
+        		setLocation(locationXFrame, locationYFrame);
+        		setVisible(true);
+            }
+        });
+		
+		// Save game
+		saveButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	saveGame(controllingAherra.score, controllingAherra.time);
+            }
+		});
+		
+		// Load game
+		loadButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	loadedGame = new String(loadGame());
+            	String[] parts = loadedGame.split(" "); // Splits by space
+            	controllingAherra.score = Integer.parseInt(parts[1]);
+            	controllingAherra.time = Integer.parseInt(parts[3]);
+            }
+		});
+		
+	}
+	
+	// INITIATE FRAMES AND PANELS
+	public void initiateFrames()
+	{
+		setSize(sizeXFrame, sizeYFrame);
+		setLocation(locationXFrame, locationYFrame);
+		setVisible(true);
+		
+		// NEW PANELS ON INSTANCE
+		Main_Panel = new JPanel(new BorderLayout());
+		Centre_Panel = new JPanel();
+		South_Panel = new JPanel();
+		North_Panel = new JPanel();
+		East_Panel = new JPanel();
+		West_Panel = new JPanel();
+		// NEW OBJECT
+		controllingAherra = new ControllingAherra();
+		
+		North_Panel.add(new JLabel("Let's Start :)"));
+		North_Panel.add(playButton);
+		Centre_Panel.add(new JLabel("HELLO ;)"));
+		South_Panel.add(new JLabel("Data: "));
+		South_Panel.add(loadButton);
+		South_Panel.add(saveButton);
+		//East_Panel.add(pauseButton);
+		West_Panel.add(helpButton);
+		
+		Main_Panel.add(Centre_Panel, BorderLayout.CENTER);
+		Main_Panel.add(South_Panel, BorderLayout.SOUTH);
+		Main_Panel.add(North_Panel, BorderLayout.NORTH);
+		Main_Panel.add(East_Panel, BorderLayout.EAST);
+		Main_Panel.add(West_Panel, BorderLayout.WEST);
+		
+		// ADD MAIN PANEL TO FRAME
+		getContentPane().add(Main_Panel);
+	}
+	
+	// LOAD IMAGES
+	public void loadImages()
+	{
+		// load the aherraFrameIcon
+		try 
+		{
+			aherraIcon = ImageIO.read(new File("C:\\Users\\Nikola\\Pictures\\aherraTiger.jpg")); 
+			aherraIcon = resizeImage(aherraIcon, 200, 185);
+			controllingAherra.tiger = aherraIcon;
+			setIconImage(aherraIcon);
+		} 
+		catch (IOException e) 
+		{
+			System.out.println("failed to load aherraIcon");
+		    e.printStackTrace();
+		}
+		// load the enerraFrameIcon
+		try 
+		{
+			enerraIcon = ImageIO.read(new File("C:\\Users\\Nikola\\Pictures\\enerraTiger.jpg")); 
+			enerraIcon = resizeImage(enerraIcon, 200, 185);
+			controllingAherra.enemyTiger = enerraIcon;
+		} 
+		catch (IOException e) 
+		{
+			System.out.println("failed to load enerraIcon");
+		    e.printStackTrace();
+		}
+	}
+	
+	BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException{
+	    Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+	    BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+	    outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+	    return outputImage;
+	}
+	
+	// SAVE
+	public void saveGame(int score, int time)
+	{
+	try 
+	{
+		// Assigning the content of the file
+		String text
+		= "score: " + score + " time: " + time;
+		
+		// Defining the file name of the file
+		Path fileName = Path.of(
+		 "C:\\Users\\Nikola\\Documents\\saveAherraGame.txt");
+		
+		// Writing into the file
+		Files.writeString(fileName, text);
+		
+		System.out.println(text);
+	}
+	catch(IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		}
+	}
+
+	// LOAD
+	public String loadGame()
+	{
+		// Defining the file name of the file
+		Path fileName = Path.of(
+		"C:\\Users\\Nikola\\Documents\\saveAherraGame.txt");
+		
+		// Reading the content of the file
+		String file_content;
+		try {
+			file_content = Files.readString(fileName);
+			
+			// Printing the content inside the file
+			System.out.println(file_content);
+			
+			return file_content;
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	return null;
+	}
+
+}
