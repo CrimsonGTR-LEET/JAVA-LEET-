@@ -84,7 +84,8 @@ public void run()
   while(true) {
     infinite loop
 
-    thread.sleep(10);
+    try { Thread.sleep(10); }
+	catch (InterruptedException e) { }	
   }
 }
 
