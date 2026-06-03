@@ -35,8 +35,9 @@ public class LandOfGael extends JFrame implements Runnable{
 
   // Global variables and objects
   int xFrameDim, xFrameLoc, yFrameDim, yFrameLoc;
-  myPanelObject aNewPanel;
-	JPanel theMainPanel;
+  myPanelObject aNewPanel, secondPanel;
+  JPanel theMainPanel;
+  boolean setSecondPanel;
 
   // MAIN METHOD CALL CONSTRUCTOR
   public static void main(String[] args) {
@@ -52,7 +53,7 @@ pulic LandOfGael() {
   initiateFramesAndObjects();
   loadButtons();
   addKeyListeners();
-	addMouseListeners();
+  addMouseListeners();
   start();
 }
 
@@ -61,28 +62,45 @@ public void initiateFramesAndObjects() {
   setSize(xFrameDim, yFrameDim);
   setLocation(xFrameLoc, yFrameLoc);
 
-  // create a new JPanel Object
+  // create new JPanel Objects
   aNewPanel = new myObjectPanel();
+  aSecondPanel = new myObjectPanel():
+  theMainPanel = new JPanel();
+
   // add our panel object to our main frame
-  this.getContentPane().add(aNewPanel);
-  // repaint the panelobject
+  this.getContentPane().add(theMainPanel);
+
+  // repaint the panelobjects
   aNewPanel.repaint();
   aNewPanel.revalidate();
+  aSecondPanel.repaint();
+  aSecondPanel.revalidate();
 }
 
 // UPDATE THE PANELS WITH REPAINTING, INSTANCED WITHIN THE INFINITE RUN LOOP
 public void updatePanelObjects() {
 
+// remove the panels first
+// this may need to be three seperate methods
+// depending on which panel is currently set!
 this.remove(theMainPanel);
 theMainPanel = new JPanel();
 
 // THE OBJECT PANEL
+// may need different methods for each diff panel object
 aNewPanel.repaint();
 // DO ANY CALCULATIONS
+if(setSecondPanel == true) {
+   aSecondPanel.settingSecondPanel = true;
+   aSecondPanel.repaint();
+}
 
 // REVALIDATE THE PANELS AND ADD THEM TO THE MAIN PANEL TO BE ADDED TO THE FRAME
 aNewPanel.revalidate();
+aSecondPanel.revalidate();
 theMainPanel.revalidate();
+
+if(
 theMainPanel.add(aNewPanel);
 
 // ADD THE PANEL TO THIS JFRAME
