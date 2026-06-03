@@ -78,6 +78,7 @@ public void initiateFramesAndObjects() {
 }
 
 // UPDATE THE PANELS WITH REPAINTING, INSTANCED WITHIN THE INFINITE RUN LOOP
+// NEED A SEPERATE METHOD TO UPDATE EACH DIFF PANEL OBJECT
 public void updatePanelObjects() {
 
 // remove the panels first
@@ -98,10 +99,12 @@ if(setSecondPanel == true) {
 // REVALIDATE THE PANELS AND ADD THEM TO THE MAIN PANEL TO BE ADDED TO THE FRAME
 aNewPanel.revalidate();
 aSecondPanel.revalidate();
-theMainPanel.revalidate();
 
-if(
-theMainPanel.add(aNewPanel);
+// Set the appropriate panel
+if(!setSecondPanel)
+   theMainPanel.add(aSecondPanel);
+else
+   theMainPanel.add(aNewPanel);
 
 // ADD THE PANEL TO THIS JFRAME
 this.getContentPane().add(theMainPanel);
@@ -122,6 +125,7 @@ public void run()
   while(true) {
     infinite loop
 
+    // Update all the panels and calculations
 	updatePanelObjects();
 
     try { Thread.sleep(10); }
